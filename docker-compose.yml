@@ -9,6 +9,11 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
     networks:
       - selenium
+  db:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
   selenium:
     image: selenium/standalone-firefox
     ports:
