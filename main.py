@@ -14,20 +14,25 @@ def logar_erro(excecao):
     logging.error(traceback_string)
 
 try:
-    mongo = MongoDB()
+    mongo = MongoDB("books")
+    books_to_scraping = mongo.retrieve_books_to_scraping()
     time.sleep(0.1)
     skoob = SkoobScraping()
     logging.info("Scraping do skoob inicializado com sucesso.")
     time.sleep(0.1)
     
-    books_to_scraping = mongo.retrieve_books_to_scraping()
     for book in books_to_scraping:
         try:
-            identificador = book["volumeInfo"]["industryIdentifiers"][0]["identifier"]
+            if book["volumeInfo"]["industryIdentifiers"]:
+                identificador = book["volumeInfo"]["industryIdentifiers"][0]["identifier"]
+            else:
+                mongo.update_book(book)
+                continue
         except IndexError:
             continue
             
         try:
+            skoob.update_page()
             skoob.select_search_method("ISBN")
             time.sleep(0.1)
             logging.info("Método de pesquisa selecionado.")
@@ -40,7 +45,9 @@ try:
             skoob.select_reviews()
         except Exception as e:
             logar_erro(e)
-            continue
+            
+        finally:
+            mongo.update_book(book)
     
 except Exception as e:
     logar_erro(e)

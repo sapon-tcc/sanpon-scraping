@@ -25,21 +25,25 @@ class Robot():
         self.url = url
         
         options = webdriver.FirefoxOptions()
-        options.headless = True
+        options.headless = False
+        self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options)
+        self.driver.get(self.url)
+        time.sleep(0.5)
+        logging.info(f'\nDriver Inicializado com sucesso.\nAcessando site: {self.url}')
         
-        try:
-            self.driver = webdriver.Remote(
-                command_executor='http://localhost:4444/wd/hub',
-                options=options,
-                desired_capabilities={'browserName': 'firefox', 'javascriptEnabled': True}
-            )
-            self.driver.get(self.url)
-            time.sleep(0.5)
-            logging.info(f'\nDriver Inicializado com sucesso.\nAcessando site: {self.url}')
-        except Exception as e:
-            logging.error(f"\nErro ao inicializar Robo: {e}\n ")
-            time.sleep(0.5)
-            raise ValueError(e)
+        # try:
+        #     self.driver = webdriver.Remote(
+        #         command_executor='http://localhost:4444/wd/hub',
+        #         options=options,
+        #         desired_capabilities={'browserName': 'firefox', 'javascriptEnabled': True}
+        #     )
+        #     self.driver.get(self.url)
+        #     time.sleep(0.5)
+        #     logging.info(f'\nDriver Inicializado com sucesso.\nAcessando site: {self.url}')
+        # except Exception as e:
+        #     logging.error(f"\nErro ao inicializar Robo: {e}\n ")
+        #     time.sleep(0.5)
+        #     raise ValueError(e)
             
     def get_element_by_class_name(self, value: str):
         self.element = self.driver.find_element(by=By.CLASS_NAME, value=value)
@@ -105,13 +109,17 @@ class Robot():
                     logging.error(f"Falha ao obter resenha, tentando próximo... {e}")
                     return
         
-        if not MongoDB().colecao.find_one({"skoobId": id}):
+        if not MongoDB("opinioes").colecao.find_one({"skoobId": id}):
             logging.info(f"Salvando Texto Extraído --> {self.element.text}")
             
-            MongoDB().colecao.insert_one({
+            MongoDB("opinioes").colecao.insert_one({
                 "skoobId": id,
                 "text": self.element.text,
                 "dtCatch": datetime.now().strftime(FORMATO)
             })
         else:
             logging.info(f"Resenha já existe na Base de Dados -->{id}")
+
+    def f5(self):
+        self.driver.get(self.url)
+        time.sleep(0.5)

@@ -68,7 +68,10 @@ class SkoobScraping():
         
         
         self.robot.get_element_by_id(self.list_of_reviews_id)
-        
+    
+    
+    def update_page(self):
+        self.robot.f5() 
         
         
         
