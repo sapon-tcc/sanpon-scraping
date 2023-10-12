@@ -1,10 +1,8 @@
-import requests
 import pandas as pd
-import json
 import time
-import datetime
 import logging
 
+from datetime import datetime
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
@@ -18,6 +16,8 @@ from .mongo import MongoDB
 # Configure o logger
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 logging.basicConfig(level=logging.ERROR, format='%(asctime)s:%(levelname)s:%(message)s')
+
+FORMATO = "%Y-%m-%d %H:%M:%S"
 
 class Robot():
     
@@ -89,28 +89,29 @@ class Robot():
         try:
             wait = WebDriverWait(self.driver, 10)
             wait.until(EC.text_to_be_present_in_element((By.ID, id), ' '))
-            logging.info(f"\n\n Texto Extraído --> {self.element.text}")
+            logging.info(f"Texto Extraído --> {self.element.text}")
         except Exception as e:
-            logging.error(f"\n\n Falha ao obter resenha, tentando clicar para carregar conteúdo dinâmico... {e}")
+            logging.error(f"Falha ao obter resenha, tentando clicar para carregar conteúdo dinâmico... {e}")
             try:
                 self.element.click()
                 wait = WebDriverWait(self.driver, 5)
                 wait.until(EC.text_to_be_present_in_element((By.ID, id), ' '))
-                logging.info(f"\n\n Texto Carregado após clique --> {self.element.text}")
+                logging.info(f"Texto Carregado após clique --> {self.element.text}")
             except:
                 try:
                     wait.until(EC.text_to_be_present_in_element((By.ID, id), ' '))
-                    logging.info(f"\n\n Texto Carregado após clique --> {self.element.text}")
+                    logging.info(f"Texto Carregado após clique --> {self.element.text}")
                 except:
-                    logging.error(f"\n\n Falha ao obter resenha, tentando próximo... {e}")
+                    logging.error(f"Falha ao obter resenha, tentando próximo... {e}")
                     return
         
         if not MongoDB().colecao.find_one({"skoobId": id}):
-            logging.info(f"\n\n Salvando Texto Extraído --> {self.element.text}")
+            logging.info(f"Salvando Texto Extraído --> {self.element.text}")
             
             MongoDB().colecao.insert_one({
                 "skoobId": id,
-                "text": self.element.text
+                "text": self.element.text,
+                "dtCatch": datetime.now().strftime(FORMATO)
             })
         else:
-            logging.info(f"\n\n Resenha já existe na Base de Dados -->{id}")
+            logging.info(f"Resenha já existe na Base de Dados -->{id}")

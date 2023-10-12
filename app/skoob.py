@@ -51,10 +51,10 @@ class SkoobScraping():
         self.robot.remove_element_dom()
         
         self.robot.get_element_by_xpath(self.xpath_element_reviews_link)
-        logging.info("\n\nAbrindo resenhas")
+        logging.info("Abrindo resenhas")
         self.robot.click()
         
-        logging.info("\n\nCapturando resenhas")
+        logging.info("Capturando resenhas")
         html = self.robot.driver.page_source
         divs = re.findall(self.regex_reviews, html)
         ids_reviews = [re.search(r'<div\s+id="(.+?)"', div).group(1) for div in divs]
