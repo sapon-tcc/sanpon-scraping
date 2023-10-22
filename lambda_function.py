@@ -45,12 +45,12 @@ def lambda_handler(event, context):
             finally:
                 mongo.update_book(book)
         
+        skoob.robot.driver.close()
     except Exception as e:
         logar_erro(e)
         
     finally:
         logging.info(f"\n\nFinalizando scraping...")
-        skoob.robot.driver.close()
         return {
             'statusCode': 200,
             'body': {},
