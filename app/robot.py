@@ -1,15 +1,15 @@
-import pandas as pd
+import os
 import time
 import logging
 
 from datetime import datetime
-from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from webdriver_manager.firefox import GeckoDriverManager
+from selenium.common.exceptions import SessionNotCreatedException
 
 from .mongo import MongoDB
 
@@ -18,32 +18,35 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(levelname)s:%(mess
 logging.basicConfig(level=logging.ERROR, format='%(asctime)s:%(levelname)s:%(message)s')
 
 FORMATO = "%Y-%m-%d %H:%M:%S"
+SELENIUM_SERVER_URL = os.getenv("SELENIUM_SERVER_URL")
 
 class Robot():
     
     def __init__(self, url: str, ) -> None:
         self.url = url
         
-        options = webdriver.FirefoxOptions()
-        options.headless = False
-        self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options)
-        self.driver.get(self.url)
-        time.sleep(0.5)
-        logging.info(f'\nDriver Inicializado com sucesso.\nAcessando site: {self.url}')
-        
-        # try:
-        #     self.driver = webdriver.Remote(
-        #         command_executor='http://localhost:4444/wd/hub',
-        #         options=options,
-        #         desired_capabilities={'browserName': 'firefox', 'javascriptEnabled': True}
-        #     )
-        #     self.driver.get(self.url)
-        #     time.sleep(0.5)
-        #     logging.info(f'\nDriver Inicializado com sucesso.\nAcessando site: {self.url}')
-        # except Exception as e:
-        #     logging.error(f"\nErro ao inicializar Robo: {e}\n ")
-        #     time.sleep(0.5)
-        #     raise ValueError(e)
+        try:
+            options = webdriver.FirefoxOptions()
+            options.headless = False
+            self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options)
+            self.driver.get(self.url)
+            time.sleep(0.5)
+        except SessionNotCreatedException as e:
+            logging.info(f'\nFalha ao inicializar drive local\nTentando remoto. \n{e}')
+            logging.info(f'\nIniciando driver remoto\n{SELENIUM_SERVER_URL}')
+            try:
+                self.driver = webdriver.Remote(
+                    command_executor=f'http://{SELENIUM_SERVER_URL}/wd/hub',
+                    options=options,
+                    desired_capabilities={'browserName': 'firefox', 'javascriptEnabled': True}
+                )
+                self.driver.get(self.url)
+                time.sleep(0.5)
+                logging.info(f'\nDriver remoto Inicializado com sucesso.\nAcessando site: {self.url}')
+            except Exception as e:
+                logging.error(f"\nErro ao inicializar driver remoto: {e}\n ")
+                time.sleep(0.5)
+                raise ValueError(e)
             
     def get_element_by_class_name(self, value: str):
         self.element = self.driver.find_element(by=By.CLASS_NAME, value=value)
