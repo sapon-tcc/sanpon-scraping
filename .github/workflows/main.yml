@@ -19,10 +19,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1  # Substitua pelo seu AWS region
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
       - name: Install dependencies and build
         run: |
-          # Comandos para instalar dependências, compilar ou qualquer outra preparação necessária
-          # Exemplo: pip install -r requirements.txt
+          pip install -r requirements.txt -t ./
 
       - name: Zip files
         run: |
