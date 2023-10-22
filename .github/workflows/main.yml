@@ -31,7 +31,14 @@ jobs:
       - name: Zip files
         run: |
           zip -r lambda-package.zip . -x "*.git*" "*__pycache__*" "*.github*"
-        
+      
+
+      - name: Update Lambda Environment Variables
+        run: |
+          aws lambda update-function-configuration \
+            --function-name sanpon-scraping-lambda \
+            --environment "Variables={ SELENIUM_SERVER_URL=${{ variable.SELENIUM_SERVER_URL }},MONGODB_URL=${{ secrets.MONGODB_URL }} }"
+
       - name: Deploy Lambda Function
         run: |
           aws lambda update-function-code \

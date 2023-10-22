@@ -1,11 +1,14 @@
 import os
 import pymongo
+import logging
+
+MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017/")
 
 class MongoDB():
     
     def __init__(self, db):
-        
-        self.client = pymongo.MongoClient(os.getenv("MONGODB_URL", "mongodb://localhost:27017/"))
+        logging.info(f"\nInicializando MongoDB: {MONGODB_URL}")
+        self.client = pymongo.MongoClient(MONGODB_URL)
         self.db = self.client["sapon"]
         self.colecao = self.db[db]
         
