@@ -31,7 +31,7 @@ class Robot():
             self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options)
             self.driver.get(self.url)
             time.sleep(0.5)
-        except SessionNotCreatedException as e:
+        except Exception as e:
             logging.info(f'\nFalha ao inicializar drive local\nTentando remoto. \n{e}')
             logging.info(f'\nIniciando driver remoto\n{SELENIUM_SERVER_URL}')
             try:
