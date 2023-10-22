@@ -31,5 +31,5 @@ jobs:
       - name: Deploy Lambda Function
         run: |
           aws lambda update-function-code \
-            --function-name NomeDaSuaFuncaoLambda \
+            --function-name sanpon-scraping-lambda \
             --zip-file fileb://lambda-package.zip
