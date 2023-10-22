@@ -1,15 +1,13 @@
 import time
-import json
+#import timeit
 import logging
 from app.mongo import MongoDB
 from app.skoob import SkoobScraping
 from app.log import logar_erro
 
-
-
-def lambda_handler(event, context):
-
+def lambda_handler(event={}, context={}):
     try:
+        start_time = time.time()
         mongo = MongoDB("books")
         books_to_scraping = mongo.retrieve_books_to_scraping()
         time.sleep(0.1)
@@ -58,3 +56,7 @@ def lambda_handler(event, context):
                 "Content-Type": "application/json"
             }
         }
+
+#execution_time = timeit.timeit(lambda_handler, number=1)
+#print(f"Tempo de execução: {execution_time} segundos")
+

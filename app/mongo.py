@@ -13,7 +13,7 @@ class MongoDB():
         self.colecao = self.db[db]
         
     def retrieve_books_to_scraping(self):
-        return self.colecao.find({"isGrated": False}).limit(10)
+        return self.colecao.find({"isGrated": False}).limit(2)
     
     def update_book(self, book):
         atualizacao = {
