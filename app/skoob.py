@@ -63,6 +63,7 @@ class SkoobScraping():
             time.sleep(1)
             id_skoob = id_review.split("resenha")
             id_completo_comentario = "resenha" + 'c' + id_skoob[-1]
+            self.robot.book_id = self.book_id
             self.robot.save_element_text(id_completo_comentario)
             
         

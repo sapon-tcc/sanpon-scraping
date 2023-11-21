@@ -26,6 +26,7 @@ def lambda_handler(event={}, context={}):
                 continue
                 
             try:
+                skoob.book_id = book["_id"]
                 skoob.update_page()
                 skoob.select_search_method("ISBN")
                 time.sleep(0.1)

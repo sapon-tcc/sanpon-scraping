@@ -118,6 +118,7 @@ class Robot():
             MongoDB("opinioes").colecao.insert_one({
                 "skoobId": id,
                 "text": self.element.text,
+                "book_id": self.book_id
                 "dtCatch": datetime.now().strftime(FORMATO)
             })
         else:
